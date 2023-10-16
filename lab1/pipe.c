@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
+				close(fds[1]); // close write end of pipe
 				int cpid2 = wait(NULL);
 				printf("child %d exited\n", cpid2);
 			}
