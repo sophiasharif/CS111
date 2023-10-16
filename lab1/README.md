@@ -1,17 +1,54 @@
-## UID: 123456789
+## UID: 105956925
 
 ## Pipe Up
 
-One sentence description
+An immitation of the pipe (|) operator in shells. Users pass in one-word executable names as command line arguments. Each process executes as a child process, and the output of one command is passed as input to the next.
 
 ## Building
 
-Explain briefly how to build your program
+To create the `pipe.o` executable, run the following command:
+
+```shell
+make pipe
+```
 
 ## Running
 
 Show an example run of your program, using at least two additional arguments, and what to expect
 
+### Example 1: ls | cat | wc
+
+```shell
+./pipe ls cat wc
+```
+
+output:
+
+```shell
+    6       6      51
+```
+
+### Example 2: ls | sort
+
+```shell
+./pipe ls sort
+```
+
+output:
+
+```shell
+Makefile
+README.md
+pipe
+pipe.c
+pipe.o
+test_lab1.py
+```
+
 ## Cleaning up
 
-Explain briefly how to clean up all binary files
+To clean up binary files, run:
+
+```shell
+make clean
+```
