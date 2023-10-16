@@ -29,9 +29,13 @@ int executeFirstCommand(char *command)
 	}
 	else
 	{
-		int cpid = wait(NULL); // wait for child to finish command
-		close(fds[1]);		   // close write end of pipe for EOF; now all write fds are closed.
-		return fds[0];		   // return read end of pipe
+		int status;
+		wait(&status); // wait for child to finish executing command
+		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+			exit(WEXITSTATUS(status));
+
+		close(fds[1]); // close write end of pipe for EOF; now all write fds are closed.
+		return fds[0]; // return read end of pipe
 	}
 	return -1;
 }
@@ -52,7 +56,10 @@ void executeLastCommand(char *command, int readEndOfPipe)
 	else
 	{
 		close(readEndOfPipe);
-		int cpid2 = wait(NULL); // wait for process to finish
+		int status;
+		wait(&status); // wait for child to finish executing command
+		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+			exit(WEXITSTATUS(status));
 	}
 }
 
@@ -76,10 +83,15 @@ int executeCommand(char *command, int readEndOfPipe)
 	}
 	else
 	{
-		close(readEndOfPipe);	// close read end of old pipe and write end of
-		close(fds[1]);			// new pipe in parent; we no longer need them.
-		int c_pid = wait(NULL); // wait for child to finish executing command
-		return fds[0];			// return read end of new pipe
+		close(readEndOfPipe); // close read end of old pipe and write end of
+		close(fds[1]);		  // new pipe in parent; we no longer need them.
+
+		int status;
+		wait(&status); // wait for child to finish executing command
+		if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+			exit(WEXITSTATUS(status));
+
+		return fds[0]; // return read end of new pipe
 	}
 	return -1;
 }

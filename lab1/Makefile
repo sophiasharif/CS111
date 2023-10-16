@@ -10,4 +10,4 @@ clean:
 	rm -f ${OBJS} pipe
 
 mac:
-	gcc pipe.c -o pipe
+	gcc pipe.c -o pipe -Wall
