@@ -23,7 +23,7 @@ int executeFirstCommand(char *command)
 	else if (p == 0) // child executes first command
 	{
 		dup2(fds[1], 1); // point stdout (fd 1) to write end of pipe (fd[1])
-		close(fds[1]);	 // close write end of pipe for EOF
+		close(fds[1]);	 // close write end of pipe
 		execlp(command, command, NULL);
 		errorExit("execlp failed");
 	}
@@ -56,6 +56,34 @@ void executeLastCommand(char *command, int readEndOfPipe)
 	}
 }
 
+int executeCommand(char *command, int readEndOfPipe)
+{
+	int fds[2]; // create pipe
+	if (pipe(fds) < 0)
+		errorExit("pipe failed");
+
+	pid_t p = fork();
+	if (p < 0)
+		errorExit("fork failed");
+	else if (p == 0)
+	{
+		dup2(readEndOfPipe, 0); // point std to read end of old pipe
+		dup2(fds[1], 1);		// point stdout to write end of new pipe
+		close(fds[0]);			// close fds; we no longer need them in the child
+		close(fds[1]);
+		execlp(command, command, NULL);
+		errorExit("execlp failed");
+	}
+	else
+	{
+		close(readEndOfPipe);	// close read end of old pipe and write end of
+		close(fds[1]);			// new pipe in parent; we no longer need them.
+		int c_pid = wait(NULL); // wait for child to finish executing command
+		return fds[0];			// return read end of new pipe
+	}
+	return -1;
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc < 2)
@@ -68,10 +96,9 @@ int main(int argc, char *argv[])
 	if (argc == 2)
 		execlp(argv[1], argv[1], NULL);
 
-	// two processes
-	if (argc == 3)
-	{
-		int readEndOfFirstPipe = executeFirstCommand(argv[1]);
-		executeLastCommand(argv[2], readEndOfFirstPipe);
-	}
+	// multiple processes
+	int readEndOfPipe = executeFirstCommand(argv[1]);
+	for (int i = 2; i < argc - 1; i += 1)
+		readEndOfPipe = executeCommand(argv[i], readEndOfPipe);
+	executeLastCommand(argv[argc - 1], readEndOfPipe);
 }
