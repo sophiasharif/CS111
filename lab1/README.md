@@ -9,6 +9,12 @@ An immitation of the pipe (|) operator in shells. Users pass in one-word executa
 To create the `pipe.o` executable, run the following command:
 
 ```shell
+make
+```
+
+or:
+
+```shell
 make pipe
 ```
 

@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/errno.h>
 
 void errorExit(const char *message)
 {
 	perror(message);
-	exit(1); // EXIT ERRNO
+	exit(errno); // EXIT ERRNO
 }
 
 // creates a pipe, executes command in a child process, returns fd for read end of pipe.
@@ -101,7 +102,8 @@ int main(int argc, char *argv[])
 	if (argc < 2)
 	{
 		fprintf(stderr, "Provide at least one command.\n");
-		exit(1); // EXIT WITH PROPER INT
+		errno = EINVAL;
+		exit(errno);
 	}
 
 	// only one process
