@@ -20,6 +20,8 @@ struct process
   pointers;
 
   /* Additional fields here */
+  int schedule_time;
+  int idle_time;
   /* End of "Additional fields here" */
 };
 
@@ -228,16 +230,25 @@ int main(int argc, char *argv[])
     {
       if (ps.process[i].arrival_time == clock)
       {
-        TAILQ_INSERT_TAIL(&list, ps.process + i, pointers);
+        struct process *curr = ps.process + i;
+        curr->idle_time = 0;
+        curr->schedule_time = -1;
+        TAILQ_INSERT_TAIL(&list, curr, pointers);
       }
     }
 
-    if (!running)
+    if (!running & !TAILQ_EMPTY(&list))
     {
       // reset current quantum
       curr_quant = quantum_length;
 
-      //
+      // schedule the next process
+      struct process *curr = TAILQ_FIRST(&list);
+      if (curr->schedule_time == -1)
+      {
+        curr->schedule_time = clock;
+        total_response_time += clock - curr->arrival_time;
+      }
 
       running = true;
     }
