@@ -189,6 +189,7 @@ int main(int argc, char *argv[])
 
   /* Your code here */
   int clock = 0;
+  int curr_quant = quantum_length;
   int num_completed = 0;
   bool running = true;
 
@@ -199,12 +200,25 @@ int main(int argc, char *argv[])
     {
       struct process *curr = TAILQ_FIRST(&list);
       curr->burst_time--;
+      curr_quant--;
 
+      // process completed; remove from queue
       if (curr->burst_time == 0)
       {
-        printf("removing %ld (time %d)\n", curr->pid, clock);
         TAILQ_REMOVE(&list, curr, pointers);
         num_completed++;
+        running = false;
+        printf("time %d [PROCESS %ld FINISH]: ", clock, curr->pid);
+        print_list(list);
+      }
+
+      // current quantum completed; move process to end of queue
+      else if (curr_quant == 0)
+      {
+        TAILQ_REMOVE(&list, curr, pointers);
+        TAILQ_INSERT_TAIL(&list, curr, pointers);
+        running = false;
+        printf("time %d [QUANTUM END]: ", clock);
         print_list(list);
       }
     }
@@ -220,6 +234,8 @@ int main(int argc, char *argv[])
 
     if (!running)
     {
+      // reset current quantum
+      curr_quant = quantum_length;
 
       //
 
