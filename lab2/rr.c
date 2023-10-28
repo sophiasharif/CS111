@@ -193,10 +193,18 @@ int main(int argc, char *argv[])
   int clock = 0;
   int curr_quant = quantum_length;
   int num_completed = 0;
-  bool running = true;
+  bool running = false;
+  bool context_switch = false;
 
   while (num_completed < ps.nprocesses)
   {
+    if (context_switch)
+    {
+      running = false;
+      context_switch = false;
+      printf("time %d [CONTEXT SWITCH]\n", clock);
+    }
+
     // check if processes have completed running
     if (running && !TAILQ_EMPTY(&list))
     {
@@ -210,6 +218,7 @@ int main(int argc, char *argv[])
         TAILQ_REMOVE(&list, curr, pointers);
         num_completed++;
         running = false;
+        context_switch = true;
         printf("time %d [PROCESS %ld FINISH]: ", clock, curr->pid);
         print_list(list);
       }
@@ -220,10 +229,16 @@ int main(int argc, char *argv[])
         TAILQ_REMOVE(&list, curr, pointers);
         TAILQ_INSERT_TAIL(&list, curr, pointers);
         running = false;
+
+        if (curr->pid != TAILQ_FIRST(&list)->pid)
+          context_switch = true;
+
         printf("time %d [QUANTUM END]: ", clock);
         print_list(list);
       }
     }
+
+    // if not running and queue it not empty, context switch
 
     // add incoming processes
     for (int i = 0; i < ps.nprocesses; i++)
@@ -234,20 +249,27 @@ int main(int argc, char *argv[])
         curr->idle_time = 0;
         curr->schedule_time = -1;
         TAILQ_INSERT_TAIL(&list, curr, pointers);
+        printf("time %d [NEW PROCESS ARRIVAL]: added process %ld to queue\n", clock, curr->pid);
       }
     }
 
+    // schedule next process
     if (!running & !TAILQ_EMPTY(&list))
     {
       // reset current quantum
       curr_quant = quantum_length;
 
-      // schedule the next process
+      // "schedule" the next process
       struct process *curr = TAILQ_FIRST(&list);
       if (curr->schedule_time == -1)
       {
-        curr->schedule_time = clock;
+        curr->schedule_time = clock + 1;
+        printf("process %ld arrived at %d and is scheduled at %d\n", curr->pid, curr->schedule_time, clock);
         total_response_time += clock - curr->arrival_time;
+        if (context_switch)
+        {
+          total_response_time++;
+        }
       }
 
       running = true;
