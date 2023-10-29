@@ -166,6 +166,15 @@ void print_list(struct process_list list)
   printf("\n");
 }
 
+int len(struct process_list list)
+{
+  int counter = 0;
+  struct process *curr;
+  TAILQ_FOREACH(curr, &list, pointers)
+  counter++;
+  return counter;
+}
+
 int main(int argc, char *argv[])
 {
   if (argc != 3)
@@ -202,6 +211,7 @@ int main(int argc, char *argv[])
     {
       running = false;
       context_switch = false;
+      total_wait_time++;
       printf("time %d [CONTEXT SWITCH]\n", clock);
     }
 
@@ -219,7 +229,7 @@ int main(int argc, char *argv[])
         num_completed++;
         running = false;
         context_switch = true;
-        printf("time %d [PROCESS %ld FINISH]: ", clock, curr->pid);
+        printf("time %d [PROCESS %ld FINISH] (new length %d): ", clock, curr->pid, len(list));
         print_list(list);
       }
 
@@ -266,16 +276,14 @@ int main(int argc, char *argv[])
         curr->schedule_time = clock + 1;
         printf("process %ld arrived at %d and is scheduled at %d\n", curr->pid, curr->schedule_time, clock);
         total_response_time += clock - curr->arrival_time;
-        if (context_switch)
-        {
-          total_response_time++;
-        }
+        total_response_time += context_switch;
       }
 
       running = true;
     }
 
     clock++;
+    total_wait_time += len(list) ? len(list) - 1 : 0;
   }
 
   print_list(list);
