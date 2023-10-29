@@ -22,6 +22,7 @@ struct process
   /* Additional fields here */
   int schedule_time;
   int idle_time;
+  long running_time;
   /* End of "Additional fields here" */
 };
 
@@ -219,11 +220,11 @@ int main(int argc, char *argv[])
     if (running && !TAILQ_EMPTY(&list))
     {
       struct process *curr = TAILQ_FIRST(&list);
-      curr->burst_time--;
+      curr->running_time++;
       curr_quant--;
 
       // process completed; remove from queue
-      if (curr->burst_time == 0)
+      if (curr->running_time == curr->burst_time)
       {
         TAILQ_REMOVE(&list, curr, pointers);
         num_completed++;
@@ -258,6 +259,7 @@ int main(int argc, char *argv[])
         struct process *curr = ps.process + i;
         curr->idle_time = 0;
         curr->schedule_time = -1;
+        curr->running_time = 0;
         TAILQ_INSERT_TAIL(&list, curr, pointers);
         printf("time %d [NEW PROCESS ARRIVAL]: added process %ld to queue\n", clock, curr->pid);
       }
