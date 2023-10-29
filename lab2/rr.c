@@ -176,6 +176,44 @@ int len(struct process_list list)
   return counter;
 }
 
+int cmpfunc(const void *a, const void *b)
+{
+  return (*(int *)a - *(int *)b);
+}
+
+int find_median(struct process_list *list, int runtimes[])
+{
+  // put times of known processes into runtimes array
+  struct process *curr;
+  int length = 0;
+  TAILQ_FOREACH(curr, list, pointers)
+  {
+    runtimes[length] = curr->running_time;
+    length++;
+  }
+
+  // sort runtimes
+  qsort(runtimes, length, sizeof(int), cmpfunc);
+
+  // get median
+  int median;
+  if (length == 0)
+    median = 1;
+  else if (length % 2 == 1)
+    median = runtimes[length / 2];
+  else
+    median = (runtimes[length / 2 - 1] + runtimes[length / 2]) / 2;
+
+  printf("runtimes: ");
+  for (int i = 0; i < length; i++)
+  {
+    printf("%d ", runtimes[i]);
+  }
+  printf("|| median: %d \n", median);
+
+  return median ? median : 1;
+}
+
 int main(int argc, char *argv[])
 {
   if (argc != 3)
@@ -205,6 +243,8 @@ int main(int argc, char *argv[])
   int num_completed = 0;
   bool running = false;
   bool context_switch = false;
+
+  int runtimes[ps.nprocesses]; // passed into median calculator
 
   while (num_completed < ps.nprocesses)
   {
@@ -249,8 +289,6 @@ int main(int argc, char *argv[])
       }
     }
 
-    // if not running and queue it not empty, context switch
-
     // add incoming processes
     for (int i = 0; i < ps.nprocesses; i++)
     {
@@ -269,14 +307,15 @@ int main(int argc, char *argv[])
     if (!running & !TAILQ_EMPTY(&list))
     {
       // reset current quantum
-      curr_quant = quantum_length;
+      curr_quant = quantum_length == -1 ? find_median(&list, runtimes) : quantum_length;
+      printf("time %d ", clock);
+      find_median(&list, runtimes);
 
       // "schedule" the next process
       struct process *curr = TAILQ_FIRST(&list);
       if (curr->schedule_time == -1)
       {
         curr->schedule_time = clock + 1;
-        printf("process %ld arrived at %d and is scheduled at %d\n", curr->pid, curr->schedule_time, clock);
         total_response_time += clock - curr->arrival_time;
         total_response_time += context_switch;
       }
