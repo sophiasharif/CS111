@@ -181,6 +181,14 @@ int cmpfunc(const void *a, const void *b)
   return (*(int *)a - *(int *)b);
 }
 
+int ave(int n1, int n2)
+{ // takes average of two numbers, rounding toward even
+  int total = n1 + n2;
+  if (total % 4 == 3)
+    return total / 2 + 1;
+  return total / 2;
+}
+
 int find_median(struct process_list *list, int runtimes[])
 {
   // put times of known processes into runtimes array
@@ -202,14 +210,14 @@ int find_median(struct process_list *list, int runtimes[])
   else if (length % 2 == 1)
     median = runtimes[length / 2];
   else
-    median = (runtimes[length / 2 - 1] + runtimes[length / 2]) / 2;
+    median = ave(runtimes[length / 2 - 1], runtimes[length / 2]);
 
-  printf("runtimes: ");
-  for (int i = 0; i < length; i++)
-  {
-    printf("%d ", runtimes[i]);
-  }
-  printf("|| median: %d \n", median);
+  // printf("runtimes: ");
+  // for (int i = 0; i < length; i++)
+  // {
+  //   printf("%d ", runtimes[i]);
+  // }
+  // printf("|| median: %d \n", median ? median : 1);
 
   return median ? median : 1;
 }
@@ -252,8 +260,9 @@ int main(int argc, char *argv[])
     {
       running = false;
       context_switch = false;
-      total_wait_time++;
-      printf("time %d [CONTEXT SWITCH]\n", clock);
+      if (len(list)) // only increment wait time if there are processes in the queue
+        total_wait_time++;
+      // printf("time %d [CONTEXT SWITCH]\n", clock);
     }
 
     // check if processes have completed running
@@ -270,8 +279,8 @@ int main(int argc, char *argv[])
         num_completed++;
         running = false;
         context_switch = true;
-        printf("time %d [PROCESS %ld FINISH] (new length %d): ", clock, curr->pid, len(list));
-        print_list(list);
+        // printf("time %d [PROCESS %ld FINISH] (new length %d): ", clock, curr->pid, len(list));
+        // print_list(list);
       }
 
       // current quantum completed; move process to end of queue
@@ -284,8 +293,8 @@ int main(int argc, char *argv[])
         if (curr->pid != TAILQ_FIRST(&list)->pid)
           context_switch = true;
 
-        printf("time %d [QUANTUM END]: ", clock);
-        print_list(list);
+        // printf("time %d [QUANTUM END]: ", clock);
+        // print_list(list);
       }
     }
 
@@ -299,7 +308,7 @@ int main(int argc, char *argv[])
         curr->schedule_time = -1;
         curr->running_time = 0;
         TAILQ_INSERT_TAIL(&list, curr, pointers);
-        printf("time %d [NEW PROCESS ARRIVAL]: added process %ld to queue\n", clock, curr->pid);
+        // printf("time %d [NEW PROCESS ARRIVAL]: added process %ld to queue\n", clock, curr->pid);
       }
     }
 
@@ -308,8 +317,6 @@ int main(int argc, char *argv[])
     {
       // reset current quantum
       curr_quant = quantum_length == -1 ? find_median(&list, runtimes) : quantum_length;
-      printf("time %d ", clock);
-      find_median(&list, runtimes);
 
       // "schedule" the next process
       struct process *curr = TAILQ_FIRST(&list);
@@ -327,7 +334,7 @@ int main(int argc, char *argv[])
     total_wait_time += len(list) ? len(list) - 1 : 0;
   }
 
-  print_list(list);
+  // print_list(list);
 
   /* End of "Your code here" */
 
