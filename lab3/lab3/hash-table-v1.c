@@ -83,10 +83,7 @@ void hash_table_v1_add_entry(struct hash_table_v1 *hash_table,
 							 uint32_t value)
 {
 	if (pthread_mutex_lock(&entry_mutex) != 0)
-	{
-		perror("mutex locking failed.");
 		exit(1);
-	}
 
 	struct hash_table_entry *hash_table_entry = get_hash_table_entry(hash_table, key);
 	struct list_head *list_head = &hash_table_entry->list_head;
@@ -105,10 +102,7 @@ void hash_table_v1_add_entry(struct hash_table_v1 *hash_table,
 	SLIST_INSERT_HEAD(list_head, list_entry, pointers);
 
 	if (pthread_mutex_unlock(&entry_mutex) != 0)
-	{
-		perror("mutex unlocking failed.");
 		exit(1);
-	}
 }
 
 uint32_t hash_table_v1_get_value(struct hash_table_v1 *hash_table,
