@@ -212,13 +212,6 @@ int find_median(struct process_list *list, int runtimes[])
   else
     median = ave(runtimes[length / 2 - 1], runtimes[length / 2]);
 
-  // printf("runtimes: ");
-  // for (int i = 0; i < length; i++)
-  // {
-  //   printf("%d ", runtimes[i]);
-  // }
-  // printf("|| median: %d \n", median ? median : 1);
-
   return median ? median : 1;
 }
 
