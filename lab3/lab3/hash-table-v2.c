@@ -93,6 +93,8 @@ void hash_table_v2_add_entry(struct hash_table_v2 *hash_table,
 	if (list_entry != NULL)
 	{
 		list_entry->value = value;
+		if (pthread_mutex_unlock(entry_lock) != 0)
+			exit(1);
 		return;
 	}
 
