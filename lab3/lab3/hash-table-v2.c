@@ -122,6 +122,8 @@ void hash_table_v2_destroy(struct hash_table_v2 *hash_table)
 	for (size_t i = 0; i < HASH_TABLE_CAPACITY; ++i)
 	{
 		struct hash_table_entry *entry = &hash_table->entries[i];
+		if (pthread_mutex_destroy(&entry->entry_lock) != 0)
+			exit(1);
 		struct list_head *list_head = &entry->list_head;
 		struct list_entry *list_entry = NULL;
 		while (!SLIST_EMPTY(list_head))
