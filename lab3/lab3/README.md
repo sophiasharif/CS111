@@ -52,6 +52,17 @@ Hash table v2: 1,404,754 usec
     - 0 missing
 ```
 
+To measure the average performance increase, I did three trials of the command above (4 threads with 100,000 items):
+
+| Trial   | Base Time | v2 Time |
+| ------- | --------- | ------- |
+| Trial 1 | 5.36s     | 1.43s   |
+| Trial 2 | 6.07s     | 1.62s   |
+| Trial 3 | 3.22s     | 1.25s   |
+| Average | 4.88s     | 1.43s   |
+
+The average speedup for v2 compared to the base version is `3.4` times faster.
+
 There are significant performance benefits with the v2 version for hash tables holding very large numbers of elements. With a larger number of elements, the overhead of managing the locks is amortized, so v2 becomes faster almost by a factor of the number of cores.
 
 ## Cleaning up
