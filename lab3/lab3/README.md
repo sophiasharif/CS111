@@ -1,6 +1,6 @@
 # Hash Hash Hash
 
-In this lab, we create two different implementations of hash tables. The first version uses a global mutex; it is thread safe but performance is worse than the unparellized version because the lock add overhead but does not allow for any operations to happen concurrently. Version 2 builds on the foundational concepts of `hash_table_v1` and introduces improved synchronization mechanisms to enhance efficiency and scalability in multithreaded environments.
+In this lab, we explore two implementations of hash tables optimized for multithreaded environments. The first version (`hash_table_v1`) employs a global mutex for thread safety, but at the cost of performance. The second version (`hash_table_v2`) builds upon v1 and introduces fine-grained locking to improve efficiency and scalability.
 
 ## Building
 
@@ -32,7 +32,9 @@ Hash table v1: 490,264 usec
 ...
 ```
 
-Although v1 is thread-safe, it performs worse than the base version because the overhead of acquiring and releasing a mutex is signifiacnt relative to the speed of the operations being performed and we don't have any parallelism in adding entries because the `hash_table_v1_add_entry` function can never run simultaneously on multiple threads.
+The mutex, while ensuring thread safety, introduces significant overhead. Since the mutex is global, it disallows parallelism in adding entries. Each thread must wait for the mutex to be released before it can perform an operation, leading to a performance bottleneck.
+
+Further, v1 is slower than the base version because of the overhead of creating and destroying the threads and context switching between different threads. Since we actually don't get any parallelism, this is just extra work on top of the ultimately sequential hash table insertion in the v1 version, while the v0 version does not have such overhead.
 
 ## Second Implementation
 
@@ -50,7 +52,7 @@ Hash table v2: 1,404,754 usec
     - 0 missing
 ```
 
-There are significant performance benefits with the v2 version for hash tables holding very large numbers of elements. With a larger number of elements, the overhead of managing the locks is amortized, so v2 becomes faster almost by a factor of the number of threads.
+There are significant performance benefits with the v2 version for hash tables holding very large numbers of elements. With a larger number of elements, the overhead of managing the locks is amortized, so v2 becomes faster almost by a factor of the number of cores.
 
 ## Cleaning up
 
