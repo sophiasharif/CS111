@@ -508,6 +508,10 @@ void write_hello_world_file_block(int fd)
 	{
 		errno_exit("lseek");
 	}
+	if (write(fd, "Hello world\n", 12) != 12)
+	{
+		errno_exit("write");
+	}
 
 	struct ext2_dir_entry fill_entry = {0};
 	fill_entry.rec_len = BLOCK_SIZE;
