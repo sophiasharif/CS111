@@ -311,6 +311,9 @@ void write_block_bitmap(int fd)
 
 	// TODO It's all yours
 	u8 map_value[BLOCK_SIZE];
+	memset(map_value, 0xFF, BLOCK_SIZE);
+	map_value[2] = 0b01111111;
+	memset(map_value + 3, 0, BLOCK_SIZE / 8 - 3);
 
 	if (write(fd, map_value, BLOCK_SIZE) != BLOCK_SIZE)
 	{
