@@ -411,7 +411,7 @@ void write_inode_table(int fd)
 
 	// hello world inode
 	struct ext2_inode hello_inode = {0};
-	char *path_to_hello_world = "hello-world";
+	char *path_to_hello_world = "/hello-world";
 	hello_inode.i_mode = EXT2_S_IFLNK | EXT2_S_IRUSR | EXT2_S_IWUSR | EXT2_S_IRGRP | EXT2_S_IROTH;
 	hello_inode.i_uid = 1000;
 	hello_inode.i_size = strlen(path_to_hello_world);
