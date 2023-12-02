@@ -23,6 +23,8 @@ typedef int32_t i32;
 // My Macros
 #define BLOCKS_PER_GROUP 8192
 #define FRAGS_PER_GROUP 8192
+#define EXT2_VALID_FS 1
+#define EXT2_ERROR_FS 2
 
 #define LOST_AND_FOUND_INO 11
 #define HELLO_WORLD_INO 12
@@ -235,7 +237,7 @@ void write_superblock(int fd)
 	superblock.s_mnt_count = 0;			   /* Number of times mounted so far */
 	superblock.s_max_mnt_count = -1;	   /* Make this unlimited */
 	superblock.s_magic = EXT2_SUPER_MAGIC; /* ext2 Signature */
-	superblock.s_state = 0;				   /* File system is clean */
+	superblock.s_state = EXT2_VALID_FS;	   /* File system is clean */
 	superblock.s_errors = 0;			   /* Ignore the error (continue on) */
 	superblock.s_minor_rev_level = 0;	   /* Leave this as 0 */
 	superblock.s_lastcheck = current_time; /* Last check time */
