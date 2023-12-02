@@ -333,7 +333,7 @@ void write_inode_bitmap(int fd)
 	// TODO It's all yours
 	u8 map_value[BLOCK_SIZE];
 	memset(map_value, 0xFF, BLOCK_SIZE);
-	// map_value[1] = 0b01111111;
+	map_value[1] = 0b00011111;
 	// memset(map_value + 2, 0, NUM_INODES / 8 - 2);
 	// map_value[BLOCK_SIZE / 8 - 1] = 0b10000000;
 
