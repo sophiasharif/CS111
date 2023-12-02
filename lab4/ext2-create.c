@@ -427,6 +427,7 @@ void write_inode_table(int fd)
 
 void write_root_dir_block(int fd)
 {
+	// TODO It's all yours
 	off_t off = BLOCK_OFFSET(ROOT_DIR_BLOCKNO);
 	off = lseek(fd, off, SEEK_SET);
 	if (off == -1)
@@ -460,11 +461,11 @@ void write_root_dir_block(int fd)
 
 	bytes_remaining -= hello_world_entry.rec_len;
 
-	struct ext2_dir_entry hello_symlink_entry = {0};
-	dir_entry_set(hello_symlink_entry, HELLO_INO, "hello");
-	dir_entry_write(hello_symlink_entry, fd);
+	struct ext2_dir_entry hello_entry = {0};
+	dir_entry_set(hello_entry, HELLO_INO, "hello");
+	dir_entry_write(hello_entry, fd);
 
-	bytes_remaining -= hello_symlink_entry.rec_len;
+	bytes_remaining -= hello_entry.rec_len;
 
 	struct ext2_dir_entry fill_entry = {0};
 	fill_entry.rec_len = bytes_remaining;
