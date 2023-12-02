@@ -512,11 +512,10 @@ void write_hello_world_file_block(int fd)
 	{
 		errno_exit("write");
 	}
-	memset(off + 16, 0x00, BLOCK_SIZE - 16);
 
-	// struct ext2_dir_entry fill_entry = {0};
-	// fill_entry.rec_len = BLOCK_SIZE-12;
-	// dir_entry_write(fill_entry, fd);
+	struct ext2_dir_entry fill_entry = {0};
+	fill_entry.rec_len = BLOCK_SIZE - 12;
+	dir_entry_write(fill_entry, fd);
 }
 
 int main(int argc, char *argv[])
