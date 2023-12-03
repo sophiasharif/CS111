@@ -232,20 +232,20 @@ void write_superblock(int fd)
 	superblock.s_blocks_per_group = BLOCKS_PER_GROUP;
 	superblock.s_frags_per_group = FRAGS_PER_GROUP;
 	superblock.s_inodes_per_group = NUM_INODES;
-	superblock.s_mtime = 0;				   /* Mount time */
-	superblock.s_wtime = current_time;	   /* Write time */
-	superblock.s_mnt_count = 0;			   /* Number of times mounted so far */
-	superblock.s_max_mnt_count = -1;	   /* Make this unlimited */
-	superblock.s_magic = EXT2_SUPER_MAGIC; /* ext2 Signature */
-	superblock.s_state = EXT2_VALID_FS;	   /* File system is clean */
-	superblock.s_errors = 0;			   /* Ignore the error (continue on) */
-	superblock.s_minor_rev_level = 0;	   /* Leave this as 0 */
-	superblock.s_lastcheck = current_time; /* Last check time */
-	superblock.s_checkinterval = 1;		   /* Force checks by making them every 1 second */
-	superblock.s_creator_os = 0;		   /* Linux */
-	superblock.s_rev_level = 0;			   /* Leave this as 0 */
-	superblock.s_def_resuid = 0;		   /* root */
-	superblock.s_def_resgid = 0;		   /* root */
+	superblock.s_mtime = 0;										  /* Mount time */
+	superblock.s_wtime = current_time;							  /* Write time */
+	superblock.s_mnt_count = 0;									  /* Number of times mounted so far */
+	superblock.s_max_mnt_count = -1;							  /* Make this unlimited */
+	superblock.s_magic = EXT2_SUPER_MAGIC;						  /* ext2 Signature */
+	superblock.s_state = EXT2_VALID_FS;							  /* File system is clean */
+	superblock.s_errors = 1; /* Ignore the error (continue on) */ // TELL CLAIRE
+	superblock.s_minor_rev_level = 0;							  /* Leave this as 0 */
+	superblock.s_lastcheck = current_time;						  /* Last check time */
+	superblock.s_checkinterval = 1;								  /* Force checks by making them every 1 second */
+	superblock.s_creator_os = 0;								  /* Linux */
+	superblock.s_rev_level = 0;									  /* Leave this as 0 */
+	superblock.s_def_resuid = 0;								  /* root */
+	superblock.s_def_resgid = 0;								  /* root */
 
 	/* You can leave everything below this line the same, delete this
 	   comment when you're done the lab */
@@ -409,7 +409,7 @@ void write_inode_table(int fd)
 	hello_world_inode.i_block[0] = HELLO_WORLD_FILE_BLOCKNO;
 	write_inode(fd, HELLO_WORLD_INO, &hello_world_inode);
 
-	// hello world inode
+	// hello inode
 	struct ext2_inode hello_inode = {0};
 	char *path_to_hello_world = "hello-world";
 	hello_inode.i_mode = EXT2_S_IFLNK | EXT2_S_IRUSR | EXT2_S_IWUSR | EXT2_S_IRGRP | EXT2_S_IROTH;
